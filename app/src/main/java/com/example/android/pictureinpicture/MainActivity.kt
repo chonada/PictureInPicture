@@ -73,6 +73,108 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    /**
+     * Handler from the PictureInPicture.
+     */
+    private val pictureInPictureHandler = object : PictureInPictureHandler() {
+        override fun initialize() {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                binding.pip.setOnClickListener {
+                    updatePictureInPictureParams(viewModel.started.value == true)?.run {
+                        enterPictureInPictureMode(this)
+                    }
+                }
+            } else {
+                binding.pip.visibility = View.GONE
+            }
+        }
+
+        /**
+         * Updates the parameters of the picture-in-picture mode for this activity based on the current
+         * [started] state of the stopwatch.
+         */
+        override fun updatePictureInPictureParams(isStarted: Boolean): PictureInPictureParams? {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                val visibleRect = Rect()
+                binding.stopwatchBackground.getGlobalVisibleRect(visibleRect)
+                val builder = PictureInPictureParams.Builder()
+                    // Set action items for the picture-in-picture mode. These are the only custom controls
+                    // available during the picture-in-picture mode.
+                    .setActions(
+                        listOf(
+                            // "Clear" action.
+                            createRemoteAction(
+                                R.drawable.ic_refresh_24dp,
+                                R.string.clear,
+                                REQUEST_CLEAR,
+                                CONTROL_TYPE_CLEAR
+                            ),
+                            if (isStarted) {
+                                // "Pause" action when the stopwatch is already started.
+                                createRemoteAction(
+                                    R.drawable.ic_pause_24dp,
+                                    R.string.pause,
+                                    REQUEST_START_OR_PAUSE,
+                                    CONTROL_TYPE_START_OR_PAUSE
+                                )
+                            } else {
+                                // "Start" action when the stopwatch is not started.
+                                createRemoteAction(
+                                    R.drawable.ic_play_arrow_24dp,
+                                    R.string.start,
+                                    REQUEST_START_OR_PAUSE,
+                                    CONTROL_TYPE_START_OR_PAUSE
+                                )
+                            }
+                        )
+                    )
+                    // Set the aspect ratio of the picture-in-picture mode.
+                    .setAspectRatio(Rational(16, 9))
+                    // Specify the portion of the screen that turns into the picture-in-picture mode.
+                    // This makes the transition animation smoother.
+                    .setSourceRectHint(visibleRect)
+
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    // Turn the screen into the picture-in-picture mode if it's hidden by the "Home" button.
+                    builder.setAutoEnterEnabled(true)
+                        // Disables the seamless resize. The seamless resize works great for videos where the
+                        // content can be arbitrarily scaled, but you can disable this for non-video content so
+                        // that the picture-in-picture mode is resized with a cross fade animation.
+                        .setSeamlessResizeEnabled(false)
+                }
+
+                val params = builder.build()
+                setPictureInPictureParams(params)
+                return params
+            }
+            return super.updatePictureInPictureParams(isStarted)
+        }
+
+        override fun createRemoteAction(
+            @DrawableRes iconResId: Int,
+            @StringRes titleResId: Int,
+            requestCode: Int,
+            controlType: Int
+        ): RemoteAction? {
+            return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                RemoteAction(
+                    Icon.createWithResource(this@MainActivity, iconResId),
+                    getString(titleResId),
+                    getString(titleResId),
+                    PendingIntent.getBroadcast(
+                        this@MainActivity,
+                        requestCode,
+                        Intent(ACTION_STOPWATCH_CONTROL)
+                            .putExtra(EXTRA_CONTROL_TYPE, controlType),
+                        PendingIntent.FLAG_IMMUTABLE
+                    )
+                )
+            } else {
+              super.createRemoteAction(iconResId, titleResId, requestCode, controlType)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = MainActivityBinding.inflate(layoutInflater)
@@ -80,13 +182,7 @@ class MainActivity : AppCompatActivity() {
         // Event handlers
         binding.clear.setOnClickListener { viewModel.clear() }
         binding.startOrPause.setOnClickListener { viewModel.startOrPause() }
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            binding.pip.setOnClickListener {
-                enterPictureInPictureMode(updatePictureInPictureParams(viewModel.started.value == true))
-            }
-        } else {
-            binding.pip.visibility = View.GONE
-        }
+        pictureInPictureHandler.initialize()
         binding.switchExample.setOnClickListener {
             startActivity(Intent(this@MainActivity, MovieActivity::class.java))
             finish()
@@ -97,9 +193,7 @@ class MainActivity : AppCompatActivity() {
             binding.startOrPause.setImageResource(
                 if (started) R.drawable.ic_pause_24dp else R.drawable.ic_play_arrow_24dp
             )
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                updatePictureInPictureParams(started)
-            }
+            pictureInPictureHandler.updatePictureInPictureParams(started)
         }
         // Handle events from the action icons on the picture-in-picture mode.
         registerReceiver(broadcastReceiver, IntentFilter(ACTION_STOPWATCH_CONTROL))
@@ -119,89 +213,5 @@ class MainActivity : AppCompatActivity() {
             binding.clear.visibility = View.VISIBLE
             binding.startOrPause.visibility = View.VISIBLE
         }
-    }
-
-    /**
-     * Updates the parameters of the picture-in-picture mode for this activity based on the current
-     * [started] state of the stopwatch.
-     */
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun updatePictureInPictureParams(started: Boolean): PictureInPictureParams {
-        val visibleRect = Rect()
-        binding.stopwatchBackground.getGlobalVisibleRect(visibleRect)
-        val builder = PictureInPictureParams.Builder()
-            // Set action items for the picture-in-picture mode. These are the only custom controls
-            // available during the picture-in-picture mode.
-            .setActions(
-                listOf(
-                    // "Clear" action.
-                    createRemoteAction(
-                        R.drawable.ic_refresh_24dp,
-                        R.string.clear,
-                        REQUEST_CLEAR,
-                        CONTROL_TYPE_CLEAR
-                    ),
-                    if (started) {
-                        // "Pause" action when the stopwatch is already started.
-                        createRemoteAction(
-                            R.drawable.ic_pause_24dp,
-                            R.string.pause,
-                            REQUEST_START_OR_PAUSE,
-                            CONTROL_TYPE_START_OR_PAUSE
-                        )
-                    } else {
-                        // "Start" action when the stopwatch is not started.
-                        createRemoteAction(
-                            R.drawable.ic_play_arrow_24dp,
-                            R.string.start,
-                            REQUEST_START_OR_PAUSE,
-                            CONTROL_TYPE_START_OR_PAUSE
-                        )
-                    }
-                )
-            )
-            // Set the aspect ratio of the picture-in-picture mode.
-            .setAspectRatio(Rational(16, 9))
-            // Specify the portion of the screen that turns into the picture-in-picture mode.
-            // This makes the transition animation smoother.
-            .setSourceRectHint(visibleRect)
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            // Turn the screen into the picture-in-picture mode if it's hidden by the "Home" button.
-            builder.setAutoEnterEnabled(true)
-                // Disables the seamless resize. The seamless resize works great for videos where the
-                // content can be arbitrarily scaled, but you can disable this for non-video content so
-                // that the picture-in-picture mode is resized with a cross fade animation.
-                .setSeamlessResizeEnabled(false)
-        }
-
-        val params = builder.build()
-        setPictureInPictureParams(params)
-        return params
-    }
-
-    /**
-     * Creates a [RemoteAction]. It is used as an action icon on the overlay of the
-     * picture-in-picture mode.
-     */
-    @RequiresApi(Build.VERSION_CODES.O)
-    private fun createRemoteAction(
-        @DrawableRes iconResId: Int,
-        @StringRes titleResId: Int,
-        requestCode: Int,
-        controlType: Int
-    ): RemoteAction {
-        return RemoteAction(
-            Icon.createWithResource(this, iconResId),
-            getString(titleResId),
-            getString(titleResId),
-            PendingIntent.getBroadcast(
-                this,
-                requestCode,
-                Intent(ACTION_STOPWATCH_CONTROL)
-                    .putExtra(EXTRA_CONTROL_TYPE, controlType),
-                PendingIntent.FLAG_IMMUTABLE
-            )
-        )
     }
 }

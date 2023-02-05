@@ -64,22 +64,22 @@ class MovieActivity : AppCompatActivity() {
 
     private lateinit var session: MediaSessionCompat
 
+    /**
+     * Handler from the PictureInPicture.
+     */
     private val pictureInPictureHandler = object : PictureInPictureHandler() {
         override fun initialize() {
-            super.initialize()
+            // Show the Picture In Picture button only
+            // if Android platform is Oreo (API 26) or newer.
+            if (isPictureInPictureSupported) {
+                binding.pip.setOnClickListener { minimize() }
+            } else {
+                binding.pip.visibility = View.GONE
+            }
         }
 
-        override val isInPictureInPictureMode: Boolean
-            get() =
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    this@MovieActivity.isInPictureInPictureMode
-                } else {
-                    super.isInPictureInPictureMode
-                }
-
-
-        override fun updatePictureInPictureParams(): PictureInPictureParams? {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+        override fun updatePictureInPictureParams(isStarted: Boolean): PictureInPictureParams? {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 // Calculate the aspect ratio of the PiP screen.
                 val aspectRatio = Rational(binding.movie.width, binding.movie.height)
                 // The movie view turns into the picture-in-picture mode.
@@ -90,20 +90,20 @@ class MovieActivity : AppCompatActivity() {
                     // Specify the portion of the screen that turns into the picture-in-picture mode.
                     // This makes the transition animation smoother.
                     .setSourceRectHint(visibleRect)
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                    // The screen automatically turns into the picture-in-picture mode when it is hidden
-                    // by the "Home" button.
-                    builder.setAutoEnterEnabled(true)
-                }
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                        // The screen automatically turns into the picture-in-picture mode when it is hidden
+                        // by the "Home" button.
+                        builder.setAutoEnterEnabled(true)
+                    }
                 val params = builder.build()
                 setPictureInPictureParams(params)
                 return params
             }
-            return super.updatePictureInPictureParams()
+            return super.updatePictureInPictureParams(isStarted)
         }
 
         override fun startPictureInPicture() {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
                 updatePictureInPictureParams()?.let { params ->
                     enterPictureInPictureMode(params)
                 }
@@ -150,7 +150,7 @@ class MovieActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Linkify.addLinks(binding.explanation, Linkify.ALL)
-        binding.pip.setOnClickListener { minimize() }
+
         binding.switchExample.setOnClickListener {
             startActivity(Intent(this@MovieActivity, MainActivity::class.java))
             finish()
@@ -204,7 +204,8 @@ class MovieActivity : AppCompatActivity() {
 
     override fun onRestart() {
         super.onRestart()
-        if (!pictureInPictureHandler.isInPictureInPictureMode) {
+
+        if (!isCurrentlyInPictureInPictureMode) {
             // Show the video controls so the video can be easily resumed.
             binding.movie.showControls()
         }
