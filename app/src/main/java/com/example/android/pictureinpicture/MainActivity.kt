@@ -26,11 +26,13 @@ import android.content.IntentFilter
 import android.content.res.Configuration
 import android.graphics.Rect
 import android.graphics.drawable.Icon
+import android.os.Build
 import android.os.Bundle
 import android.util.Rational
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android.pictureinpicture.databinding.MainActivityBinding
@@ -78,8 +80,12 @@ class MainActivity : AppCompatActivity() {
         // Event handlers
         binding.clear.setOnClickListener { viewModel.clear() }
         binding.startOrPause.setOnClickListener { viewModel.startOrPause() }
-        binding.pip.setOnClickListener {
-            enterPictureInPictureMode(updatePictureInPictureParams(viewModel.started.value == true))
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            binding.pip.setOnClickListener {
+                enterPictureInPictureMode(updatePictureInPictureParams(viewModel.started.value == true))
+            }
+        } else {
+            binding.pip.visibility = View.GONE
         }
         binding.switchExample.setOnClickListener {
             startActivity(Intent(this@MainActivity, MovieActivity::class.java))
@@ -91,7 +97,9 @@ class MainActivity : AppCompatActivity() {
             binding.startOrPause.setImageResource(
                 if (started) R.drawable.ic_pause_24dp else R.drawable.ic_play_arrow_24dp
             )
-            updatePictureInPictureParams(started)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                updatePictureInPictureParams(started)
+            }
         }
         // Handle events from the action icons on the picture-in-picture mode.
         registerReceiver(broadcastReceiver, IntentFilter(ACTION_STOPWATCH_CONTROL))
@@ -117,10 +125,11 @@ class MainActivity : AppCompatActivity() {
      * Updates the parameters of the picture-in-picture mode for this activity based on the current
      * [started] state of the stopwatch.
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun updatePictureInPictureParams(started: Boolean): PictureInPictureParams {
         val visibleRect = Rect()
         binding.stopwatchBackground.getGlobalVisibleRect(visibleRect)
-        val params = PictureInPictureParams.Builder()
+        val builder = PictureInPictureParams.Builder()
             // Set action items for the picture-in-picture mode. These are the only custom controls
             // available during the picture-in-picture mode.
             .setActions(
@@ -156,13 +165,17 @@ class MainActivity : AppCompatActivity() {
             // Specify the portion of the screen that turns into the picture-in-picture mode.
             // This makes the transition animation smoother.
             .setSourceRectHint(visibleRect)
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
             // Turn the screen into the picture-in-picture mode if it's hidden by the "Home" button.
-            .setAutoEnterEnabled(true)
-            // Disables the seamless resize. The seamless resize works great for videos where the
-            // content can be arbitrarily scaled, but you can disable this for non-video content so
-            // that the picture-in-picture mode is resized with a cross fade animation.
-            .setSeamlessResizeEnabled(false)
-            .build()
+            builder.setAutoEnterEnabled(true)
+                // Disables the seamless resize. The seamless resize works great for videos where the
+                // content can be arbitrarily scaled, but you can disable this for non-video content so
+                // that the picture-in-picture mode is resized with a cross fade animation.
+                .setSeamlessResizeEnabled(false)
+        }
+
+        val params = builder.build()
         setPictureInPictureParams(params)
         return params
     }
@@ -171,6 +184,7 @@ class MainActivity : AppCompatActivity() {
      * Creates a [RemoteAction]. It is used as an action icon on the overlay of the
      * picture-in-picture mode.
      */
+    @RequiresApi(Build.VERSION_CODES.O)
     private fun createRemoteAction(
         @DrawableRes iconResId: Int,
         @StringRes titleResId: Int,
