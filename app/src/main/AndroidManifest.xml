@@ -9,11 +9,6 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".InformActivity"
-            android:theme="@style/AppDialogTheme"
-            android:excludeFromRecents="true"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity"
             android:configChanges="screenSize|smallestScreenSize|screenLayout|orientation"
             android:exported="true"

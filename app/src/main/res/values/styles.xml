@@ -32,11 +32,30 @@
     <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
         <item name="windowActionBar">false</item>
         <item name="windowNoTitle">true</item>
+        <item name="android:buttonBarNegativeButtonStyle">@style/NegativeButtonStyle</item>
+        <item name="android:buttonBarPositiveButtonStyle">@style/PositiveButtonStyle</item>
+        <item name="android:buttonBarNeutralButtonStyle">@style/NeutralButtonStyle</item>
     </style>
     <style name="AppDialogTheme.Title" parent="TextAppearance.AppCompat.Large">
         <item name="android:textSize">20sp</item>
     </style>
     <style name="AppDialogTheme.Message" parent="TextAppearance.AppCompat.Body1">
         <item name="android:textSize">14sp</item>
+    </style>
+
+    <style name="NegativeButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:textColor">@color/red</item>
+    </style>
+
+    <style name="PositiveButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:textColor">@color/red</item>
+    </style>
+
+    <style name="NeutralButtonStyle" parent="Widget.MaterialComponents.Button">
+        <item name="android:background">?attr/selectableItemBackground</item>
+        <item name="android:textColor">@color/primary_dark</item>
+        <item name="android:textSize">20sp</item>
     </style>
 </resources>

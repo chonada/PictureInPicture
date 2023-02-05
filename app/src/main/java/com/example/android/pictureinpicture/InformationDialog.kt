@@ -9,6 +9,11 @@ import com.example.android.pictureinpicture.databinding.FragmentInformationBindi
 class InformationDialog : DialogFragment(){
     private lateinit var binding: FragmentInformationBinding
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setStyle(STYLE_NO_TITLE, R.style.AppDialogTheme)
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -16,12 +21,6 @@ class InformationDialog : DialogFragment(){
     ): View? {
         binding = FragmentInformationBinding.inflate(inflater, container, false)
         return binding.root
-    }
-
-    override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val dialog = super.onCreateDialog(savedInstanceState)
-        dialog.window?.requestFeature(Window.FEATURE_NO_TITLE)
-        return dialog
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
