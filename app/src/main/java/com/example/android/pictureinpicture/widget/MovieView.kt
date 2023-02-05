@@ -19,6 +19,7 @@ package com.example.android.pictureinpicture.widget
 import android.content.Context
 import android.graphics.Color
 import android.media.MediaPlayer
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.Message
@@ -361,7 +362,20 @@ class MovieView @JvmOverloads constructor(
             player.reset()
             try {
                 resources.openRawResourceFd(videoResourceId).use { fd ->
-                    player.setDataSource(fd)
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+                        player.setDataSource(fd)
+                    } else {
+                        if (fd.declaredLength < 0) {
+                            player.setDataSource(fd.fileDescriptor)
+                        } else {
+                            player.setDataSource(
+                                fd.fileDescriptor,
+                                fd.startOffset,
+                                fd.declaredLength
+                            )
+                        }
+                    }
+
                     player.setOnPreparedListener { mediaPlayer ->
                         // Adjust the aspect ratio of this view
                         requestLayout()

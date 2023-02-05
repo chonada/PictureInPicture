@@ -75,6 +75,7 @@ class MovieActivity : AppCompatActivity() {
                 binding.pip.setOnClickListener { minimize() }
             } else {
                 binding.pip.visibility = View.GONE
+                binding.explanation.text = resources.getText(R.string.explanation_movie_no_pip)
             }
         }
 
@@ -90,11 +91,11 @@ class MovieActivity : AppCompatActivity() {
                     // Specify the portion of the screen that turns into the picture-in-picture mode.
                     // This makes the transition animation smoother.
                     .setSourceRectHint(visibleRect)
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                        // The screen automatically turns into the picture-in-picture mode when it is hidden
-                        // by the "Home" button.
-                        builder.setAutoEnterEnabled(true)
-                    }
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    // The screen automatically turns into the picture-in-picture mode when it is hidden
+                    // by the "Home" button.
+                    builder.setAutoEnterEnabled(true)
+                }
                 val params = builder.build()
                 setPictureInPictureParams(params)
                 return params
@@ -150,7 +151,7 @@ class MovieActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         Linkify.addLinks(binding.explanation, Linkify.ALL)
-
+        pictureInPictureHandler.initialize()
         binding.switchExample.setOnClickListener {
             startActivity(Intent(this@MovieActivity, MainActivity::class.java))
             finish()

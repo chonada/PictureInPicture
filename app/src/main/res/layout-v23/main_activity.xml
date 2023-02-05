@@ -64,7 +64,6 @@
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_margin="@dimen/spacing_medium"
-        android:autoSizeTextType="uniform"
         android:gravity="center"
         android:maxLines="1"
         android:textColor="@android:color/white"
@@ -102,7 +101,6 @@
                 app:layout_constraintTop_toBottomOf="@id/stopwatch_background" />
 
             <TextView
-                android:id="@+id/explanation"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_medium"

@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2017 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -17,4 +16,5 @@
 <resources>
     <dimen name="spacing_medium">16dp</dimen>
     <dimen name="button_size">64dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
 </resources>

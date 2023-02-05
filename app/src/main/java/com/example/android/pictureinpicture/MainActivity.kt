@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.content.res.Resources
 import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.os.Build
@@ -86,6 +87,7 @@ class MainActivity : AppCompatActivity() {
                 }
             } else {
                 binding.pip.visibility = View.GONE
+                binding.explanation?.text = resources.getString(R.string.explanation_no_pip)
             }
         }
 

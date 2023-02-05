@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
  Copyright 2017 The Android Open Source Project
 
  Licensed under the Apache License, Version 2.0 (the "License");
@@ -28,6 +27,9 @@
     picture-in-picture mode. The stopwatch keeps on working seamlessly between mode changes.
     The stopwatch controls are available in the picture-in-picture mode through the overlay actions.
     ]]></string>
+    <string name="explanation_no_pip"><![CDATA[
+    The stopwatch keeps on working seamlessly between mode changes.
+    ]]></string>
     <string name="switch_media_session">Switch to using MediaSession</string>
 
     <!-- Movie -->
@@ -41,6 +43,9 @@
     The sample plays a video. The video keeps on playing when the app is turned in to
     Picture-in-Picture mode. On Picture-in-Picture screen, the app shows an action item to pause or
     resume the video.\n\n
+    Movie: (c) copyright 2008, Blender Foundation. See https://peach.blender.org/.
+    ]]></string>
+    <string name="explanation_movie_no_pip"><![CDATA[
     Movie: (c) copyright 2008, Blender Foundation. See https://peach.blender.org/.
     ]]></string>
     <string name="switch_custom">Switch to custom actions example</string>
