@@ -59,10 +59,15 @@ class MainViewModel: ViewModel() {
         } else {
             _started.value = true
             job = viewModelScope.launch { start() }
+            job?.invokeOnCompletion {
+                // Write to Preferences
+                println("ANOOP ${time.value}")
+            }
         }
     }
 
     private suspend fun CoroutineScope.start() {
+        // Read from Preferences
         startUptimeMillis = SystemClock.uptimeMillis() - (timeMillis.value ?: 0L)
         while (isActive) {
             timeMillis.value = SystemClock.uptimeMillis() - startUptimeMillis
