@@ -20,6 +20,7 @@ import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.CoroutineScope
@@ -29,12 +30,12 @@ import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlin.time.Duration
 
-class MainViewModel: ViewModel() {
+class MainViewModel(private val storedTimeRepository: StoredTimeRepository): ViewModel() {
 
     private var job: Job? = null
 
     private var startUptimeMillis = SystemClock.uptimeMillis()
-    private val timeMillis = MutableLiveData(0L)
+    private val timeMillis = MutableLiveData(storedTimeRepository.timeStamp)
 
     private val _started = MutableLiveData(false)
 
@@ -60,14 +61,12 @@ class MainViewModel: ViewModel() {
             _started.value = true
             job = viewModelScope.launch { start() }
             job?.invokeOnCompletion {
-                // Write to Preferences
-                println("ANOOP ${time.value}")
+                storedTimeRepository.timeStamp = timeMillis.value ?: 0L
             }
         }
     }
 
     private suspend fun CoroutineScope.start() {
-        // Read from Preferences
         startUptimeMillis = SystemClock.uptimeMillis() - (timeMillis.value ?: 0L)
         while (isActive) {
             timeMillis.value = SystemClock.uptimeMillis() - startUptimeMillis
@@ -82,5 +81,16 @@ class MainViewModel: ViewModel() {
     fun clear() {
         startUptimeMillis = SystemClock.uptimeMillis()
         timeMillis.value = 0L
+    }
+
+    companion object {
+        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
+            @Suppress("UNCHECKED_CAST")
+            override fun <T : ViewModel> create(
+                modelClass: Class<T>
+            ): T {
+                return MainViewModel(StoredTimeRepository()) as T
+            }
+        }
     }
 }
