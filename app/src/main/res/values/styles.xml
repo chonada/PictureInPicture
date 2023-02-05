@@ -29,4 +29,14 @@
         <item name="android:adjustViewBounds">false</item>
     </style>
 
+    <style name="AppDialogTheme" parent="Theme.AppCompat.Light.Dialog">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+    <style name="AppDialogTheme.Title" parent="TextAppearance.AppCompat.Large">
+        <item name="android:textSize">20sp</item>
+    </style>
+    <style name="AppDialogTheme.Message" parent="TextAppearance.AppCompat.Body1">
+        <item name="android:textSize">14sp</item>
+    </style>
 </resources>

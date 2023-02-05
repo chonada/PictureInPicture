@@ -18,6 +18,7 @@
 
     <!-- Stopwatch -->
     <eat-comment />
+    <string name="ok">OK</string>
     <string name="clear">Clear</string>
     <string name="start">Start</string>
     <string name="pause">Pause</string>
@@ -48,6 +49,12 @@
     <string name="explanation_movie_no_pip"><![CDATA[
     Movie: (c) copyright 2008, Blender Foundation. See https://peach.blender.org/.
     ]]></string>
+    <string name="information"><![CDATA[
+    This app attempts to demonstrate basic usage of Picture-in-Picture mode for handheld devices.
+    However since this device runs a version of Android which is older than Oreo, it cannot work
+    in Picture in Picture mode. However it can just show a video playback and the timer as normal activities.
+    ]]></string>
+    <string name="information_title">Please be aware</string>
     <string name="switch_custom">Switch to custom actions example</string>
     <string name="title_bigbuckbunny">Big Buck Bunny</string>
 </resources>

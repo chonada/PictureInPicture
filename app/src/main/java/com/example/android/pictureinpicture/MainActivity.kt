@@ -24,7 +24,6 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
-import android.content.res.Resources
 import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.os.Build
@@ -33,7 +32,6 @@ import android.util.Rational
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
-import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android.pictureinpicture.databinding.MainActivityBinding
@@ -88,6 +86,7 @@ class MainActivity : AppCompatActivity() {
             } else {
                 binding.pip.visibility = View.GONE
                 binding.explanation?.text = resources.getString(R.string.explanation_no_pip)
+                showInformationDialog()
             }
         }
 
@@ -215,5 +214,9 @@ class MainActivity : AppCompatActivity() {
             binding.clear.visibility = View.VISIBLE
             binding.startOrPause.visibility = View.VISIBLE
         }
+    }
+
+    private fun showInformationDialog() {
+        InformationDialog().show(supportFragmentManager, null)
     }
 }
