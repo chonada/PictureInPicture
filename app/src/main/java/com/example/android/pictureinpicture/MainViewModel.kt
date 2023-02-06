@@ -23,23 +23,49 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
+import com.example.android.pictureinpicture.data.TimerSessionRepository
+import com.example.android.pictureinpicture.data.TimerSession
+import com.example.android.pictureinpicture.util.SystemTimeSource
+import com.example.android.pictureinpicture.util.TimeSource
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
-import kotlin.time.Duration
 
-class MainViewModel(private val storedTimeRepository: StoredTimeRepository): ViewModel() {
-
+class MainViewModel(
+    private val timerSessionRepository: TimerSessionRepository,
+    private val timeSource: TimeSource
+    ): ViewModel() {
     private var job: Job? = null
 
-    private var startUptimeMillis = SystemClock.uptimeMillis()
-    private val timeMillis = MutableLiveData(storedTimeRepository.timeStamp)
+    private var startUptimeMillis = timeSource.getTimeMillis()
+    private val timeMillis = MutableLiveData(initialOffset)
 
-    private val _started = MutableLiveData(false)
+    // The timeoffset that is set initially. This will be zero when starting afresh,
+    // but when restarting after coming back from MovieActivity,
+    // this will be calculated as a sum of previous timeoffset (when leaving MainActivity) plus the
+    // milliseconds that the MainActivity was  dead for.
+    private val initialOffset: Long
+    get() {
+        return if (previouslyStarted) {
+            val timeSpent =
+                timeSource.getTimeMillis() - timerSessionRepository.timerSession.timestamp
+            timerSessionRepository.timerSession.offset + timeSpent
+        } else {
+            timerSessionRepository.timerSession.offset
+        }
+    }
+
+    // Flag representing if the stopwatch was running when MainActivity exited
+    private val previouslyStarted: Boolean
+    get() = timerSessionRepository.timerSession.started
+
+    private val _started = MutableLiveData(previouslyStarted)
 
     val started: LiveData<Boolean> = _started
+
+    // Converts the timestamp to a displayable string
     val time = timeMillis.map { millis ->
         val minutes = millis / 1000 / 60
         val m = minutes.toString().padStart(2, '0')
@@ -55,41 +81,72 @@ class MainViewModel(private val storedTimeRepository: StoredTimeRepository): Vie
      */
     fun startOrPause() {
         if (_started.value == true) {
-            _started.value = false
-            job?.cancel()
+            pause()
         } else {
-            _started.value = true
-            job = viewModelScope.launch { start() }
-            job?.invokeOnCompletion {
-                storedTimeRepository.timeStamp = timeMillis.value ?: 0L
-            }
+            start()
+        }
+    }
+
+    /**
+     * Starts the stopwatch.
+     */
+    private fun start() {
+        _started.value = true
+        job = viewModelScope.launch { start() }
+        job?.invokeOnCompletion {
+            val offset = timeMillis.value ?: 0L
+            val timeStamp = SystemClock.uptimeMillis()
+            val state = started.value ?: false
+            timerSessionRepository.timerSession = TimerSession(timeStamp, offset, state)
+        }
+    }
+
+    /**
+     * Pause the stopwatch.
+     */
+    private fun pause() {
+        _started.value = false
+        job?.cancel()
+    }
+
+    /**
+     * If stopwatch was running previously when the activity exited,
+     * then start again.
+     */
+    fun evaluateAndRestoreState() {
+        if (previouslyStarted) {
+            start()
         }
     }
 
     private suspend fun CoroutineScope.start() {
-        startUptimeMillis = SystemClock.uptimeMillis() - (timeMillis.value ?: 0L)
+        startUptimeMillis = timeSource.getTimeMillis() - (timeMillis.value ?: 0L)
         while (isActive) {
-            timeMillis.value = SystemClock.uptimeMillis() - startUptimeMillis
+            timeMillis.value = timeSource.getTimeMillis() - startUptimeMillis
             // Updates on every render frame.
-            awaitFrame()
+            timeSource.delay()
         }
     }
 
     /**
      * Clears the stopwatch to 00:00:00.
+     * Cleanup the repository
      */
     fun clear() {
-        startUptimeMillis = SystemClock.uptimeMillis()
+        startUptimeMillis = timeSource.getTimeMillis()
         timeMillis.value = 0L
+        timerSessionRepository.clear()
     }
-
     companion object {
+        /**
+         * ViewModel Factory
+         */
         val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(
                 modelClass: Class<T>
             ): T {
-                return MainViewModel(StoredTimeRepository()) as T
+                return MainViewModel(TimerSessionRepository(), SystemTimeSource()) as T
             }
         }
     }

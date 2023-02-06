@@ -73,7 +73,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Handler from the PictureInPicture.
+     * Handler for the PictureInPicture feature.
      */
     private val pictureInPictureHandler = object : PictureInPictureHandler() {
         override fun initialize() {
@@ -198,6 +198,7 @@ class MainActivity : AppCompatActivity() {
         }
         // Handle events from the action icons on the picture-in-picture mode.
         registerReceiver(broadcastReceiver, IntentFilter(ACTION_STOPWATCH_CONTROL))
+        viewModel.evaluateAndRestoreState()
     }
 
     // This is called when the activity gets into or out of the picture-in-picture mode.
