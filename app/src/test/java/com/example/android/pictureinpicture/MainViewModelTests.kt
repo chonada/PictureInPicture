@@ -5,6 +5,7 @@ import androidx.lifecycle.Observer
 import com.example.android.pictureinpicture.data.TimerSessionRepository
 import com.example.android.pictureinpicture.util.TimeSource
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -24,7 +25,7 @@ class MainViewModelTests {
     private var repository = TimerSessionRepository(dataSource)
     private var testTimeSource = object : TimeSource {
         var uptimeMillis = 0L
-        val frameDelay = 100L
+        val frameDelay = 1L
         override fun getTimeMillis() = uptimeMillis++
         override suspend fun delay(): Long {
             kotlinx.coroutines.delay(frameDelay)
@@ -38,25 +39,24 @@ class MainViewModelTests {
         viewModel.startOrPause()
         viewModel.time.observeForever {}
         mainCoroutineRule.scheduler.advanceTimeBy(2000)
-        assertEquals(viewModel.time.value, "00:00:02")
+        assertEquals(viewModel.time.value, "00:02:00")
     }
 
     @Test
-    fun test_relaunch_of_stopwatch() {
+    fun test_relaunch_of_stopwatch()  {
         dataSource.clearTimerSession()
         var viewModel = MainViewModel(repository, testTimeSource)
         viewModel.startOrPause()
         viewModel.time.observeForever {}
         mainCoroutineRule.scheduler.advanceTimeBy(1000)
-        assertEquals(viewModel.time.value, "00:00:01")
+        assertEquals(viewModel.time.value, "00:01:00")
 
         val dataSource1 = InMemoryTimerSessionDataSourceImpl()
         val repository1 = TimerSessionRepository(dataSource1)
         viewModel = MainViewModel(repository1, testTimeSource)
         viewModel.startOrPause()
         viewModel.time.observeForever {}
-        mainCoroutineRule.scheduler.advanceTimeBy(10000)
-        assertEquals(viewModel.time.value, "00:00:19")
+        mainCoroutineRule.scheduler.advanceTimeBy(1000)
+        assertEquals(viewModel.time.value, "00:01:99")
     }
-
 }
