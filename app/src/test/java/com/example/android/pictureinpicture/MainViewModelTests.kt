@@ -41,4 +41,22 @@ class MainViewModelTests {
         assertEquals(viewModel.time.value, "00:00:02")
     }
 
+    @Test
+    fun test_relaunch_of_stopwatch() {
+        dataSource.clearTimerSession()
+        var viewModel = MainViewModel(repository, testTimeSource)
+        viewModel.startOrPause()
+        viewModel.time.observeForever {}
+        mainCoroutineRule.scheduler.advanceTimeBy(1000)
+        assertEquals(viewModel.time.value, "00:00:01")
+
+        val dataSource1 = InMemoryTimerSessionDataSourceImpl()
+        val repository1 = TimerSessionRepository(dataSource1)
+        viewModel = MainViewModel(repository1, testTimeSource)
+        viewModel.startOrPause()
+        viewModel.time.observeForever {}
+        mainCoroutineRule.scheduler.advanceTimeBy(10000)
+        assertEquals(viewModel.time.value, "00:00:19")
+    }
+
 }
