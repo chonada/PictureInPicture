@@ -32,9 +32,11 @@ import android.util.Rational
 import android.view.View
 import androidx.activity.viewModels
 import androidx.annotation.DrawableRes
+import androidx.annotation.RequiresApi
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import com.example.android.pictureinpicture.databinding.MainActivityBinding
+import dagger.hilt.android.AndroidEntryPoint
 
 /** Intent action for stopwatch controls from Picture-in-Picture mode.  */
 private const val ACTION_STOPWATCH_CONTROL = "stopwatch_control"
@@ -50,9 +52,10 @@ private const val REQUEST_START_OR_PAUSE = 4
 /**
  * Demonstrates usage of Picture-in-Picture mode on phones and tablets.
  */
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private val viewModel: MainViewModel by viewModels { MainViewModel.Factory }
+    private val viewModel by viewModels<MainViewModel>()// { MainViewModel.Factory }
     private lateinit var binding: MainActivityBinding
 
     /**
@@ -202,10 +205,12 @@ class MainActivity : AppCompatActivity() {
     }
 
     // This is called when the activity gets into or out of the picture-in-picture mode.
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun onPictureInPictureModeChanged(
         isInPictureInPictureMode: Boolean,
-        newConfig: Configuration?
+        newConfig: Configuration
     ) {
+        super.onPictureInPictureModeChanged(isInPictureInPictureMode, newConfig)
         if (isInPictureInPictureMode) {
             // Hide in-app buttons. They cannot be interacted in the picture-in-picture mode, and
             // their features are provided as the action icons.

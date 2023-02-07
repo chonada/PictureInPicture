@@ -20,20 +20,20 @@ import android.os.SystemClock
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.example.android.pictureinpicture.data.TimerSessionRepository
 import com.example.android.pictureinpicture.data.TimerSession
-import com.example.android.pictureinpicture.util.SystemTimeSource
 import com.example.android.pictureinpicture.util.TimeSource
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.android.awaitFrame
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class MainViewModel(
+@HiltViewModel
+class MainViewModel @Inject constructor(
     private val timerSessionRepository: TimerSessionRepository,
     private val timeSource: TimeSource
     ): ViewModel() {
@@ -136,18 +136,5 @@ class MainViewModel(
         startUptimeMillis = timeSource.getTimeMillis()
         timeMillis.value = 0L
         timerSessionRepository.clear()
-    }
-    companion object {
-        /**
-         * ViewModel Factory
-         */
-        val Factory: ViewModelProvider.Factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(
-                modelClass: Class<T>
-            ): T {
-                return MainViewModel(TimerSessionRepository(), SystemTimeSource()) as T
-            }
-        }
     }
 }

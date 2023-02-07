@@ -1,6 +1,7 @@
 package com.example.android.pictureinpicture
 
 import com.example.android.pictureinpicture.data.TimerSession
+import javax.inject.Inject
 
 /**
  * The interface defining the operations supported by the data source
@@ -12,7 +13,7 @@ interface TimerSessionDataSource {
     fun clearTimerSession()
 }
 
-class InMemoryTimerSessionDataSourceImpl(): TimerSessionDataSource {
+class InMemoryTimerSessionDataSourceImpl @Inject constructor(): TimerSessionDataSource {
     override fun readTimerSession(): TimerSession = timerSession
 
     override fun storeTimerSession(timerSession: TimerSession) {
