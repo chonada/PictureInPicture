@@ -2,6 +2,7 @@ package com.example.android.pictureinpicture.data
 
 import com.example.android.pictureinpicture.InMemoryTimerSessionDataSourceImpl
 import com.example.android.pictureinpicture.TimerSessionDataSource
+import dagger.hilt.android.scopes.ViewModelScoped
 import javax.inject.Inject
 
 class TimerSessionRepository @Inject constructor(

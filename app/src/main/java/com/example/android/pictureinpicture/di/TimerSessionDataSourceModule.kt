@@ -8,12 +8,13 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ViewModelComponent
-import dagger.hilt.components.SingletonComponent
+import dagger.hilt.android.scopes.ViewModelScoped
 
 @Module
-@InstallIn(SingletonComponent::class)
+@InstallIn(ViewModelComponent::class)
 abstract class TimerSessionDataSourceModule {
     @Binds
+    @ViewModelScoped
     abstract fun provideTimerSessionDataSource(
         timerSessionDataSourceImpl: InMemoryTimerSessionDataSourceImpl
     ) : TimerSessionDataSource
