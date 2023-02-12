@@ -1,5 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!--
+<?xml version="1.0" encoding="utf-8"?><!--
   ~ Copyright (C) 2021 The Android Open Source Project
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,65 +13,80 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
 -->
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/background"
     android:orientation="vertical">
 
-    <View
+    <com.google.android.material.card.MaterialCardView
         android:id="@+id/stopwatch_background"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:background="@color/primary"
+        android:layout_margin="@dimen/card_margin"
+        android:background="@color/color_on_primary"
+        android:elevation="@dimen/card_elevation"
+        app:cardCornerRadius="@dimen/card_corner_radius"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintDimensionRatio="16:9"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0" />
+        app:layout_constraintVertical_bias="0">
 
-    <ImageButton
-        android:id="@+id/clear"
-        android:layout_width="@dimen/button_size"
-        android:layout_height="@dimen/button_size"
-        android:layout_margin="@dimen/spacing_medium"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_refresh_24dp"
-        app:layout_constraintBottom_toBottomOf="@id/stopwatch_background"
-        app:layout_constraintStart_toStartOf="@id/stopwatch_background"
-        app:layout_constraintTop_toTopOf="@id/stopwatch_background"
-        app:tint="@android:color/white" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
 
-    <ImageButton
-        android:id="@+id/start_or_pause"
-        android:layout_width="@dimen/button_size"
-        android:layout_height="@dimen/button_size"
-        android:layout_margin="@dimen/spacing_medium"
-        android:background="?attr/selectableItemBackgroundBorderless"
-        android:src="@drawable/ic_play_arrow_24dp"
-        app:layout_constraintBottom_toBottomOf="@id/stopwatch_background"
-        app:layout_constraintEnd_toEndOf="@id/stopwatch_background"
-        app:layout_constraintTop_toTopOf="@id/stopwatch_background"
-        app:tint="@android:color/white" />
+            <ImageButton
+                android:id="@+id/clear"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                android:layout_margin="@dimen/spacing_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_refresh_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/primary_dark" />
 
-    <TextView
-        android:id="@+id/time"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_margin="@dimen/spacing_medium"
-        android:autoSizeTextType="uniform"
-        android:gravity="center"
-        android:maxLines="1"
-        android:textColor="@android:color/white"
-        app:layout_constraintBottom_toBottomOf="@id/stopwatch_background"
-        app:layout_constraintEnd_toStartOf="@id/start_or_pause"
-        app:layout_constraintStart_toEndOf="@id/clear"
-        app:layout_constraintTop_toTopOf="@id/stopwatch_background"
-        tools:text="12:34:56" />
+            <ImageButton
+                android:id="@+id/start_or_pause"
+                android:layout_width="@dimen/button_size"
+                android:layout_height="@dimen/button_size"
+                android:layout_margin="@dimen/spacing_medium"
+                android:background="?attr/selectableItemBackgroundBorderless"
+                android:importantForAccessibility="no"
+                android:src="@drawable/ic_play_arrow_24dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:tint="@color/primary_dark" />
+
+            <TextView
+                android:id="@+id/time"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_margin="@dimen/spacing_medium"
+                android:autoSizeTextType="uniform"
+                android:gravity="center"
+                android:maxLines="1"
+                android:shadowDx="@integer/timer_text_shadow_offset"
+                android:shadowDy="@integer/timer_text_shadow_offset"
+                android:shadowRadius="@integer/timer_text_shadow_radius"
+                android:textColor="@color/primary_dark"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toStartOf="@id/start_or_pause"
+                app:layout_constraintStart_toEndOf="@id/clear"
+                app:layout_constraintTop_toTopOf="parent"
+                style="@style/AppTheme.TextAppearance.Headline"
+                tools:text="12:34:56" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </com.google.android.material.card.MaterialCardView>
 
     <ScrollView
         android:id="@+id/scroll"
@@ -90,13 +104,12 @@
             android:orientation="vertical"
             android:padding="@dimen/spacing_medium">
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/pip"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:drawableStart="@drawable/ic_picture_in_picture_alt"
                 android:drawablePadding="@dimen/spacing_medium"
-                android:drawableTint="@android:color/black"
+                app:icon="@drawable/ic_picture_in_picture_alt"
                 android:text="@string/enter_picture_in_picture"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@id/stopwatch_background" />
@@ -111,15 +124,13 @@
                 android:text="@string/explanation_main"
                 android:textAppearance="@style/TextAppearance.AppCompat.Body1" />
 
-            <Button
+            <com.google.android.material.button.MaterialButton
                 android:id="@+id/switch_example"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="@dimen/spacing_medium"
                 android:text="@string/switch_media_session" />
-
         </LinearLayout>
 
     </ScrollView>
-
 </androidx.constraintlayout.widget.ConstraintLayout>

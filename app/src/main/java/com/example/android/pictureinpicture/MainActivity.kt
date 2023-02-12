@@ -24,6 +24,7 @@ import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
 import android.content.res.Configuration
+import android.content.res.Resources.Theme
 import android.graphics.Rect
 import android.graphics.drawable.Icon
 import android.os.Build
@@ -216,9 +217,13 @@ class MainActivity : AppCompatActivity() {
             // their features are provided as the action icons.
             binding.clear.visibility = View.GONE
             binding.startOrPause.visibility = View.GONE
+            binding.stopwatchBackground.elevation = 0.0F
+            binding.main.setBackgroundColor(resources.getColor(R.color.transparent, null))
         } else {
             binding.clear.visibility = View.VISIBLE
             binding.startOrPause.visibility = View.VISIBLE
+            binding.stopwatchBackground.elevation = resources.getDimension(R.dimen.card_elevation)
+            binding.main.setBackgroundColor(resources.getColor(R.color.background, null))
         }
     }
 

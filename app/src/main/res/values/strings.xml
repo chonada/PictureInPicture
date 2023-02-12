@@ -57,4 +57,5 @@
     <string name="information_title">Please be aware</string>
     <string name="switch_custom">Switch to custom actions example</string>
     <string name="title_bigbuckbunny">Big Buck Bunny</string>
+    <string name="submit">submit</string>
 </resources>

@@ -20,4 +20,7 @@
     <dimen name="default_padding">16dp</dimen>
     <dimen name="default_margin">16dp</dimen>
     <dimen name="default_spacing">10dp</dimen>
+    <dimen name="card_margin">10dp</dimen>
+    <dimen name="card_elevation">10dp</dimen>
+    <dimen name="card_corner_radius">8dp</dimen>
 </resources>
